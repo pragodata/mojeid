@@ -1,0 +1,5 @@
+div.mojeid_login_box{border: 1px solid #fc0; border-radius: 5px; padding: 1em; background: #feb; margin: 0 auto 2em auto; width: 50%; text-align: center; min-width: 250px;}
+div.mojeid_login_box>div{margin: 1em 0;}
+div.mojeid_login_box a{color: blue;}
+div.mojeid_login_box a:hover{color: red;}
+div.mojeid_login_box strong{color: red;}
