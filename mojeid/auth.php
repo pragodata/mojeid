@@ -33,6 +33,11 @@ class auth_plugin_mojeid extends auth_plugin_base{
 	private $required_mojeid_user_values=array('firstname','lastname','email');
 	private $optional_params=array('city'=>'h_city','country'=>'h_country','icq'=>'icq','skype'=>'skype','phone1'=>'phone','phone2'=>'phone_mobile','url'=>'url',);
 	private $address_params=array('h_address','h_city','h_postcode','h_state',);
+	private $verification_levels=array(
+			'pin1_pin2'=>'CONDITIONALLY_IDENTIFIED',
+			'pin3'=>'IDENTIFIED',
+			'validation'=>'VALIDATED',
+			'validation_adult_control'=>'VALIDATED');
 	/* @var $db moodle_database */
 	private $db;
 	private $user_record;
@@ -41,6 +46,9 @@ class auth_plugin_mojeid extends auth_plugin_base{
 		global $DB;
 		$this->authtype='mojeid';
 		$this->config=get_config('auth/mojeid');
+		if(empty($this->config->verification_level)){
+			$this->config->verification_level='pin1_pin2';
+		}
 		$this->setDb($DB);
 	}
 
@@ -152,8 +160,9 @@ class auth_plugin_mojeid extends auth_plugin_base{
 	 */
 	function process_config($config){
 		set_config('security_level', $config->security_level, 'auth/mojeid');
-		set_config('adult_control', (int)$config->adult_control, 'auth/mojeid');
+		set_config('verification_level', (string)$config->verification_level, 'auth/mojeid');
 		set_config('why_mojeid_url', (string)$config->why_mojeid_url, 'auth/mojeid');
+		set_config('login_mojeid_url', (string)$config->login_mojeid_url, 'auth/mojeid');
 		return true;
 	}
 
@@ -169,11 +178,12 @@ class auth_plugin_mojeid extends auth_plugin_base{
 		$PAGE->requires->js('/auth/mojeid/js/jquery-1.11.1.min.js');
 		$PAGE->requires->js('/auth/mojeid/js/mojeid.js');
 		$PAGE->requires->css('/auth/mojeid/css/mojeid.css');
+		$image_url=($this->config->login_mojeid_url ? $this->config->login_mojeid_url : $CFG->wwwroot.'/auth/mojeid/api/image/155x24.png');
 		$return='
 <div id="wrapper" class="mojeid_login_box">
 		<strong>'.$verification_finish.'</strong>
     <div class="form">
-      <a href="'.$CFG->wwwroot.'/auth/mojeid/api/auth.php"><img src="'.$CFG->wwwroot.'/auth/mojeid/api/image/155x24.png" alt="'.get_string('sign_in_with', 'auth_mojeid').'"></a>
+      <a href="'.$CFG->wwwroot.'/auth/mojeid/api/auth.php"><img src="'.$image_url.'" alt="'.get_string('sign_in_with', 'auth_mojeid').'"></a>
 		</div>
 	  <div class="links">
 	    <span id="why"><a href="'.$url.'">'.get_string('why', 'auth_mojeid').'</a></span>
@@ -194,7 +204,8 @@ class auth_plugin_mojeid extends auth_plugin_base{
 				try{
 					$this
 									->setMojeidUserValues($mojeid['values'])
-									->AdultControl()
+									->verificationLevelControl()
+									->adultControl()
 									->login()
 									->isEmailAvailable()
 									->createUser()
@@ -214,18 +225,65 @@ class auth_plugin_mojeid extends auth_plugin_base{
 		return $return;
 	}
 
-	private function AdultControl(){
-		if($this->config->adult_control && ((empty($this->mojeid_user_values['adult']) || $this->mojeid_user_values['adult']==='False') || (empty($this->mojeid_user_values['valid']) || $this->mojeid_user_values['valid']==='False'))){
-			$msg=get_string('adult_control_failed','auth_mojeid');
-			if(empty($this->mojeid_user_values['adult']) || $this->mojeid_user_values['adult']==='False'){
-				$msg.='<br/>'.get_string('you_are_not_adult','auth_mojeid');
+	private function verificationLevelControl(){
+		$user_level=false;
+		$min_level=false;
+		$verificated=false;
+		foreach($this->verification_levels as $level => $status){
+			if($level===$this->config->verification_level ){
+				$min_level=true;
 			}
-			if(empty($this->mojeid_user_values['valid']) || $this->mojeid_user_values['valid']==='False'){
-				$msg.='<br/>'.get_string('your_account_is_not_valid','auth_mojeid');
+			if($min_level && $this->mojeid_user_values['status']===$status){
+				$verificated=true;
 			}
+			if($this->mojeid_user_values['status']===$status){
+				$user_level=$level;
+			}
+		}
+
+		if($user_level && !$verificated){
+			$msg=get_string('verification_level_control_failed', 'auth_mojeid').'<br>'
+					.get_string('your_verification_level_is', 'auth_mojeid').' "'.get_string($user_level,'auth_mojeid').'".<br>'
+					.get_string('minimal_verification_level_is', 'auth_mojeid').' "'.get_string($this->config->verification_level,'auth_mojeid').'".';
 			throw new Exception($msg);
 		}
 		return $this;
+	}
+
+	private function adultControl(){
+		$msg=false;
+		if($this->mojeid_user_values['status']){
+			$msg=$this->adultControlFullVersion();
+		}
+		else{
+			$msg=$this->adultControlSemiVersion();
+		}
+		if($msg){
+			$msg=get_string('adult_control_failed','auth_mojeid').$msg;
+			throw new Exception($msg);
+		}
+		return $this;
+	}
+
+	private function adultControlFullVersion(){
+		$return=null;
+		if($this->config->verification_level==='validation_adult_control' && ((empty($this->mojeid_user_values['adult']) || $this->mojeid_user_values['adult']==='False') || (empty($this->mojeid_user_values['valid']) || $this->mojeid_user_values['valid']==='False'))){
+			if(empty($this->mojeid_user_values['adult']) || $this->mojeid_user_values['adult']==='False'){
+				$return='<br/>'.get_string('you_are_not_adult','auth_mojeid');
+			}
+			if(empty($this->mojeid_user_values['valid']) || $this->mojeid_user_values['valid']==='False'){
+				$return='<br/>'.get_string('your_account_is_not_valid','auth_mojeid');
+			}
+		}
+		return $return;
+	}
+
+	private function adultControlSemiVersion(){
+		$return=null;
+		if($this->config->verification_level==='validation_adult_control' && (empty($this->mojeid_user_values['adult']) || $this->mojeid_user_values['adult']==='False')){
+			$return='<br/>'.get_string('you_are_not_adult','auth_mojeid');
+		}
+		return $return;
 	}
 
 	private function isEmailAvailable(){
@@ -303,10 +361,13 @@ class auth_plugin_mojeid extends auth_plugin_base{
 	 * @return stdClass
 	 */
 	private function printUserData(){
+		global $CFG;
 		$user_data=$this->printMojeIdUserData();
 		$user_data['username']=strtolower($this->mojeid_user_values['email']);
 		$user_data['password']='Wok3#'.md5(time());
 		$user_data['auth']=$this->authtype;
+		$user_data['confirmed']=true;
+		$user_data['mnethostid']=$CFG->mnet_localhost_id;
 		return (object)$user_data;
 	}
 
