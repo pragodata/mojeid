@@ -58,6 +58,11 @@ $ax_attributes = array(
 		'text'     => 'Email – Hlavní',
 		'required' => true
 	),
+	'status' => array(
+		'scheme'   => 'http://specs.nic.cz/attr/contact/status',
+		'text'     => 'Stav účtu',
+		'required' => true
+	),
 
 
 
@@ -368,14 +373,9 @@ $ax_attributes = array(
 //		'text'     => 'Příznak - Student',
 //		'required' => FALSE
 //	),
-//	'status' => array(
-//		'scheme'   => 'http://specs.nic.cz/attr/contact/status',
-//		'text'     => 'Stav účtu',
-//		'required' => FALSE
-//	),
 );
 
-if($config->adult_control){
+if($config->verification_level==='validation_adult_control'){
 	$ax_attributes['adult']=array(
 		'scheme'   => 'http://specs.nic.cz/attr/contact/adult',
 		'text'     => 'Příznak – Starší 18 let',
@@ -383,7 +383,7 @@ if($config->adult_control){
 	);
 }
 
-if (empty($_SESSION['none'])) {
+if (empty($_SESSION['nonce'])) {
 	$_SESSION['nonce'] = md5(uniqid());
 }
 

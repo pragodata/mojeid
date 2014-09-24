@@ -1,23 +1,25 @@
-mojeID autentifikační plugin pro Moodle
+mojeID authentication plugin for Moodle
 =======================================
 
-Toto rozšíření přidá na standardní přihlašovací stranu Moodle blok pro možnost přihlášení přes autoritu mojeID.
+This extension adds to the Moodle login page the block with option to sign in using the authority mojeID.
 
-Pokud se přes toho rozšíření uživatel poprvé přihlásí do Moodle, pak se jeho účet automaticky vytvoří.
+If the user is signing into Moodle through this extension first time, then its account is automatically created.
 
-Pokud ale už v systému je uživatel se stejným emailem, pak přihlášení skončí neúspěchem.
-Tuto situaci je možné ošetřit požádáním správce systému o změnu autorizačního pluginu u daného účtu na metodu mojeID.
+But if there is an user account in the system with the same user email, then the login fails.
+This situation can be solved by asking the system administrator to change the authorization plugin to the method "mojeID" for that user account.
 
-Instalace rozšíření:
---------------------
-Od verze Moodle 2.5 je možné instalovat rozšíření automaticky z [Moodle.org](https://moodle.org/plugins/view.php?plugin=auth_googleoauth2).
-Pro manuální instalaci, nebo pro jiné verze, následujte tyto kroky:
+Warning. The extension changes the value of the configuration variable "additionalhtmlhead". Without this change, the extension will not be working.
 
-1. nahrajte obsah rozšíření do adresáře /auth/mojeid/
+Installation of extensions:
+---------------------------
+From Moodle version 2.5 or higher it is possible to install extensions automatically from Moodle.org.
+For manual installation, or a different version, follow these steps:
 
-2. v nastavení Moodle rozšíření povolte (správa stránek > moduly > ověřování uživatelů)
+1. save the extension content to the directory /auth/mojeid/
 
-3. následujte instrukce v nastavení rozšíření
+2. at Moodle settings enable this extension (site administration > Plugins > Authentication)
+
+3. follow the instructions in the extension settings
 
 Author
 -------

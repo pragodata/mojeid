@@ -16,18 +16,42 @@ global $OUTPUT;
 		</td>
     <td><?php print_string('security_level_info', 'auth_mojeid') ?></td>
 	</tr>
+
 	<tr>
-    <td align="right"><label for="adult_control"><?php print_string('adult_control', 'auth_mojeid') ?></label></td>
+    <td align="right"><label for="verification_level"><?php print_string('verification_level', 'auth_mojeid') ?></label></td>
     <td>
-			<input type="checkbox" name="adult_control" id="adult_control" <?php echo (empty($config->adult_control) ? false : ' checked="checked"') ?> value="1" />
+			<select name="verification_level" id="verification_level">
+				<?php
+				$arr=array(
+						'pin1_pin2',
+						'pin3',
+						'validation',
+						'validation_adult_control',
+						);
+				foreach($arr as $item){
+					echo '<option value="'.$item.'"'.(!empty($config->verification_level) && $config->verification_level===$item ? ' selected="selected"' : false).'>';
+					print_string($item,'auth_mojeid');
+					echo '</option>';
+				}
+				?>
+			</select>
 		</td>
-    <td><?php print_string('adult_control_info', 'auth_mojeid') ?></td>
+    <td><?php print_string('verification_level_info', 'auth_mojeid') ?></td>
 	</tr>
+
 	<tr>
     <td align="right"><label for="why_mojeid_url"><?php print_string('why_mojeid_url', 'auth_mojeid') ?></label></td>
     <td>
 			<input type="text" name="why_mojeid_url" id="why_mojeid_url" <?php echo (empty($config->why_mojeid_url) ? false : ' value="'.$config->why_mojeid_url.'"') ?> />
 		</td>
     <td><?php print_string('why_mojeid_url_info', 'auth_mojeid') ?></td>
+	</tr>
+
+	<tr>
+    <td align="right"><label for="login_mojeid_url"><?php print_string('login_mojeid_url', 'auth_mojeid') ?></label></td>
+    <td>
+			<input type="text" name="login_mojeid_url" id="login_mojeid_url" <?php echo (empty($config->login_mojeid_url) ? false : ' value="'.$config->login_mojeid_url.'"') ?> />
+		</td>
+    <td><?php print_string('login_mojeid_url_info', 'auth_mojeid') ?></td>
 	</tr>
 </table>

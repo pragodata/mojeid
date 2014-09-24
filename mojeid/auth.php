@@ -66,8 +66,8 @@ class auth_plugin_mojeid extends auth_plugin_base{
 	}
 
 	/**
-	 * Returns true if the username and password work or don't exist and false
-	 * if the user exists and the password is wrong.
+	 * Returns true if the username and password work and false if they are
+	 * wrong or don't exist.
 	 *
 	 * @param string $username The username
 	 * @param string $password The password
@@ -75,12 +75,12 @@ class auth_plugin_mojeid extends auth_plugin_base{
 	 */
 	function user_login($username, $password){
 		global $CFG, $DB;
-		if($user=$DB->get_record('user', array(
-				'username'=>$username,
-				'mnethostid'=>$CFG->mnet_localhost_id))){
-			return validate_internal_user_password($user, $password);
+		$return=false;
+		$user=$DB->get_record('user', array('username'=>$username,'mnethostid'=>$CFG->mnet_localhost_id));
+		if($user){
+			$return=validate_internal_user_password($user, $password);
 		}
-		return true;
+		return $return;
 	}
 
 	/**
@@ -314,6 +314,7 @@ class auth_plugin_mojeid extends auth_plugin_base{
 			$user_data=$this->printUserData();
 			$user_data->username=$actual_data->username;
 			$user_data->id=$actual_data->id;
+			$user_data->lastlogin=$this->printTimestamp();
 			$this->setUserRecord($user_data);
 			user_update_user($user_data);
 		}
@@ -349,12 +350,18 @@ class auth_plugin_mojeid extends auth_plugin_base{
 
 	private function createUser(){
 		try{
-			user_create_user($this->printUserData());
+			$user_data=$this->printUserData();
+			$user_data->firstaccess=$this->printTimestamp();
+			user_create_user($user_data);
 		}
 		catch(Exception $exc){
 			throw new Exception(get_string('unknown_error_during_create_user','auth_mojeid').' ('.$exc->getMessage().')');
 		}
 		return $this;
+	}
+
+	private function printTimestamp(){
+		return make_timestamp(date('Y'),date('m'),date('d'),date('H'),date('i'),date('s'));
 	}
 
 	/**
