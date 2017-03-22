@@ -323,7 +323,7 @@ class auth_plugin_mojeid extends auth_plugin_base{
 
 	private function sessionSetUser(){
 		global $CFG;
-		session_set_user($this->user_record);
+		\core\session\manager::set_user($this->user_record);
 		header('location:'.$CFG->wwwroot);
 		exit();
 	}

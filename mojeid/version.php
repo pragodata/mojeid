@@ -22,8 +22,18 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2014092201;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->release = '1.2';
+$plugin->version   = 2017032100;        // The current plugin version (Date: YYYYMMDDXX)
+$plugin->release = '2.0';
 $plugin->maturity = MATURITY_STABLE;
-$plugin->requires  = 2013051403;        // Requires this Moodle version
+$plugin->requires  = 2013111800;        // Requires this Moodle version
 $plugin->component = 'auth_mojeid';       // Full name of the plugin (used for diagnostics)
+
+/**
+ * 2. 0
+ *		- 21.3.17 14:03
+ *		- functionality for Moodle 2.6 - 3.1
+ *				- replaced using of deprecated function \session_set_user()
+ * 1.2
+ *		- 22.9.14 9:24
+ *		- base functionality for Moodle 2.5 - 2.7
+ */
