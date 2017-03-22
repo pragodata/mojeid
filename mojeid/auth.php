@@ -178,7 +178,7 @@ class auth_plugin_mojeid extends auth_plugin_base{
 		$PAGE->requires->js('/auth/mojeid/js/jquery-1.11.1.min.js');
 		$PAGE->requires->js('/auth/mojeid/js/mojeid.js');
 		$PAGE->requires->css('/auth/mojeid/css/mojeid.css');
-		$image_url=($this->config->login_mojeid_url ? $this->config->login_mojeid_url : $CFG->wwwroot.'/auth/mojeid/api/image/155x24.png');
+		$image_url=(!empty($this->config->login_mojeid_url) ? $this->config->login_mojeid_url : $CFG->wwwroot.'/auth/mojeid/api/image/155x24.png');
 		$return='
 <div id="wrapper" class="mojeid_login_box">
 		<strong>'.$verification_finish.'</strong>
