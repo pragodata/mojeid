@@ -21,6 +21,22 @@ For manual installation, or a different version, follow these steps:
 
 3. follow the instructions in the extension settings
 
+A procedure for resolving conflicts with an existing account (username, email):
+-------------------------------------------------------------------------------
+
+1. In the administration go to the page with list of users (/admin/users.php).
+
+2. Find a conflicting user account here.
+
+3. Go to the page with the details of that account.
+
+4. Choose "Edit Profile".
+
+5. Set the authentication method to "MojeID".
+
+6. Confirm with the save option at the bottom of the page.
+
+
 Author
 -------
 [PragoData Consulting, s.r.o.](http://www.pragodata.cz)

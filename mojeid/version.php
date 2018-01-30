@@ -23,12 +23,15 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->version   = 2017032100;        // The current plugin version (Date: YYYYMMDDXX)
-$plugin->release = '2.0';
+$plugin->release = '2.1';
 $plugin->maturity = MATURITY_STABLE;
 $plugin->requires  = 2013111800;        // Requires this Moodle version
 $plugin->component = 'auth_mojeid';       // Full name of the plugin (used for diagnostics)
 
 /**
+ * 2.1
+ *      - 30.1.18 13:27
+ *      - successfully tested for a new version moodle (3.2, 3.3, 3.4)
  * 2. 0
  *		- 21.3.17 14:03
  *		- functionality for Moodle 2.6 - 3.1
